@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include 
-from grouppay_app_api import urls as grouppay_app_urls
+# from grouppay_app_api import urls as grouppay_app_urls
 
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
-from grouppay_app_django.grouppay_app_api.schema import schema
+from grouppay_app_api.schema import schema
 
 
 
