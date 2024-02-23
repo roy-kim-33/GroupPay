@@ -40,13 +40,20 @@ class Account(models.Model):
     def __str__(self):
         return f"Account {self.id} - Balance {self.balance}"
 
+# PaymentStatus model
+class PaymentStatus(models.Model):
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.description
+
 # Group model
 class Group(models.Model):
     name = models.CharField(max_length=255)
     leader_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='led_groups')
     created_at = models.DateTimeField(auto_now_add=True)
     payment = models.FloatField()
-    status = models.ForeignKey('PaymentStatus', on_delete=models.SET_NULL)
+    status = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL)
     description = models.TextField()
 
     def __str__(self):
@@ -63,12 +70,7 @@ class GroupMember(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.group.name}"
 
-# PaymentStatus model
-class PaymentStatus(models.Model):
-    description = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.description
 
 
 # ''''''
