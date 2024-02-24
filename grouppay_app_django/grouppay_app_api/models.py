@@ -22,12 +22,12 @@ class User(AbstractBaseUser):
     # id = models.UUIDField
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    password_hash = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
     
     objects = UserManager()
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'password_hash']
+    REQUIRED_FIELDS = ['username', 'password']
 
     def __str__(self):
         return self.username
@@ -35,7 +35,7 @@ class User(AbstractBaseUser):
 # Account model
 class Account(models.Model):
     balance = models.FloatField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user') # accounts with user_id=n aree deleeted if user with id=n is deleted
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='account') # accounts with user_id=n aree deleeted if user with id=n is deleted
 
     def __str__(self):
         return f"Account {self.id} - Balance {self.balance}"
