@@ -1,10 +1,10 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.http import Http404
-from django.db import models
+from django.db.models import Model, Q
 from .models import *
 
-def get_model_or_404(model: models.Model, id):
+def get_model_or_404(model: Model, id):
     try:
         return model.objects.get(id=id)
     except model.DoesNotExist:
@@ -38,7 +38,7 @@ class GroupMemberType(DjangoObjectType):
 
 
 #QUERIES -- GET models
-class Query:
+class Query(graphene.ObjectType):
     # Define queries
     users_list = graphene.List(UserType)
     accounts_list = graphene.List(AccountType)
@@ -55,12 +55,13 @@ class Query:
     
     # Define query resolvers
     # NOTE TO PEERS: Currently assuming potential need to filter on all fields. This may not be necessary.
-        #places to consider removing filter functionality:
-            # accounts: balance
-            # payment_statuses: description
-            # groups: description
+        # places to consider removing filter functionality:
+    # users: password_hash - removed
+    # accounts: balance - removed
+    # payment_statuses: description - kept for debugging
+    # groups: description - removed
     
-    def resolve_users_list(self, info, id=None, username=None, email=None, password_hash=None):
+    def resolve_users_list(self, info, id=None, username=None, email=None):
         filters = {}
         if id is not None:
             filters['id__exact'] = id
@@ -68,19 +69,37 @@ class Query:
             filters['username__icontains'] = username
         if email is not None:
             filters['email__icontains'] = email
-        if password_hash is not None:
-            filters['password_hash__exact'] = password_hash
-        return models.User.objects.all().filter(**filters)    
+        return User.objects.filter(**filters)
+
+
+
+    # def resolve_users_list(self, info, **kwargs):
+    # # Predefined keys that you expect in kwargs that correspond to your User model fields
+    #     valid_keys = {'id', 'username', 'email'}
+    #     # Construct filters dict dynamically, filtering out None values
+    #     # filters = {f"{key}__icontains": value for key, value in kwargs.items() if key in valid_keys and value is not None}
+    #     query_filter = Q()
+    #     for key, value in kwargs.items():
+    #         if key in valid_keys and value is not None:
+    #             query_filter &= Q(**{f'{key}__icontains': value})
+        
+        
+    #     # For exact match on 'id', adjust the filter condition
+    #     if 'id' in kwargs and kwargs['id'] is not None:
+    #         query_filter &= Q(id__exact=kwargs['id'])
+    #         # Remove the icontains filter for 'id' if it was added
+    #         query_filter &= ~Q(id__icontains=kwargs['id']) # ~ removes id__icontains from query_filter
+        
+    #     return User.objects.filter(query_filter)
     
-    def resolve_accounts_list(self, info, id=None, balance=None, user_id=None):
+    
+    def resolve_accounts_list(self, info, id=None, user_id=None):
         filters = {}
         if id is not None:
             filters['id__exact'] = id
-        if balance is not None:
-            filters['balance__icontains'] = balance
         if user_id is not None:
             filters['user_id__exact'] = user_id
-        return models.Account.objects.all().filter(**filters)  
+        return Account.objects.filter(**filters)
           
     def resolve_payment_statuses_list(self, info, id=None, description=None):
         filters = {}
@@ -88,9 +107,9 @@ class Query:
             filters['id__exact'] = id
         if description is not None:
             filters['description__icontains'] = description
-        return models.PaymentStatus.objects.all().filter(**filters)  
+        return PaymentStatus.objects.filter(**filters)  
     
-    def resolve_groups_list(self, info, id=None, name=None, leader_user=None, created_at=None, payment=None, status=None, description=None):
+    def resolve_groups_list(self, info, id=None, name=None, leader_user=None, created_at=None, payment=None, status=None, **kwargs):
         filters = {}
         if id is not None:
             filters['id__exact'] = id
@@ -104,9 +123,7 @@ class Query:
             filters['payment__exact'] = payment
         if status is not None:
             filters['status__icontains'] = status
-        if description is not None:
-            filters['description__icontains'] = description
-        return models.Group.objects.all().filter(**filters)
+        return Group.objects.filter(**filters)
       
     def resolve_group_members_list(self, info, id=None, user=None, group=None, is_leader=None, accepted_payment=None, accepted_payment_at=None):
         filters = {}
@@ -122,7 +139,7 @@ class Query:
             filters['accepted_payment__icontains'] = accepted_payment
         if accepted_payment_at is not None:
             filters['accepted_payment_at__icontains'] = accepted_payment_at
-        return models.GroupMember.objects.all().filter(**filters)      
+        return GroupMember.objects.filter(**filters)      
 
 
 # '''should be include Serializer

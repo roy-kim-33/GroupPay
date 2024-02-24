@@ -16,18 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include 
-# from grouppay_app_api import urls as grouppay_app_urls
 
 from graphene_django.views import GraphQLView
-from django.views.decorators.csrf import csrf_exempt
-from grouppay_app_api.schema import schema
+from grouppay_app_api import urls as group_pay_app_urls
 
 
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    path("users/", csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema)))
-
+    path('api/', include(group_pay_app_urls)),
+    path('api', include(group_pay_app_urls))
 ]
