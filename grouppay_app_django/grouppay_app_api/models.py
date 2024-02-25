@@ -30,7 +30,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['username', 'password']
 
     def __str__(self):
-        return self.username
+        return f"User {self.username}"
 
 # Account model
 class Account(models.Model):
@@ -42,33 +42,33 @@ class Account(models.Model):
 
 # PaymentStatus model
 class PaymentStatus(models.Model):
-    description = models.CharField(max_length=255)
+    about = models.CharField(max_length=500)
 
     def __str__(self):
-        return self.description
+        return f"Status code {self.id} - {self.about}"
 
 # Group model
 class Group(models.Model):
     name = models.CharField(max_length=255)
-    leader_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='led_groups')
+    leader_user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='led_groups')
     created_at = models.DateTimeField(auto_now_add=True)
     payment = models.FloatField()
-    status = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL)
-    description = models.TextField()
+    status_id = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL)
+    about = models.CharField(max_length=500)
 
     def __str__(self):
-        return self.name
+        return f"Group {self.name}"
 
 # GroupMember model
 class GroupMember(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships')
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships')
+    group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
     is_leader = models.BooleanField(default=False)
     accepted_payment = models.BooleanField(default=False)
     accepted_payment_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.group.name}"
+        return f"GroupMember {self.user.username} in {self.group_id.name}"
 
 
 
