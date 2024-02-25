@@ -189,6 +189,7 @@ export const POST_GROUP = gql`
         id
         name
         leader_user_id
+        created_at
         payment
         status_id
         about
@@ -204,6 +205,7 @@ export const PATCH_GROUP = gql`
         id
         name
         leader_user_id
+        created_at
         payment
         status_id
         about
@@ -219,6 +221,7 @@ export const DELETE_GROUP = gql`
         id
         name
         leader_user_id
+        created_at
         payment
         status_id
         about
@@ -238,6 +241,7 @@ export const POST_GROUP_MEMBER = gql`
         group_id
         is_leader
         accepted_payment
+        accepted_payment_at
       }
     }
   }
@@ -252,6 +256,7 @@ export const PATCH_GROUP_MEMBER = gql`
         group_id
         is_leader
         accepted_payment
+        accepted_payment_at
       }
     }
   }
@@ -266,6 +271,7 @@ export const DELETE_GROUP_MEMBER = gql`
         group_id
         is_leader
         accepted_payment
+        accepted_payment_at
       }
     }
   }
