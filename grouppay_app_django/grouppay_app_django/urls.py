@@ -18,13 +18,13 @@ from django.contrib import admin
 from django.urls import path, include 
 
 from graphene_django.views import GraphQLView
-from grouppay_app_api import urls as group_pay_app_urls
+from grouppay_app_api import urls as grouppay_app_urls
 
 
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/', include(group_pay_app_urls)),
-    path('api', include(group_pay_app_urls))
+    path('api/', include(grouppay_app_urls)),
+    path('api', include(grouppay_app_urls))
 ]

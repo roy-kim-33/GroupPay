@@ -16,7 +16,7 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
-
+    
 # Custom user model
 class User(AbstractBaseUser):
     # id = models.UUIDField
@@ -61,14 +61,14 @@ class Group(models.Model):
 
 # GroupMember model
 class GroupMember(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships')
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group')
     is_leader = models.BooleanField(default=False)
     accepted_payment = models.BooleanField(default=False)
     accepted_payment_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"GroupMember {self.user.username} in {self.group_id.name}"
+        return f"GroupMember {self.user_id.username} in {self.group_id.name}"
 
 
 
