@@ -146,9 +146,39 @@ export const DELETE_ACCOUNT = gql`
 `
 
 //PAYMENT STATUS 
-  //create (post)
-  //update (patch)
-  //delete
+  //create (post) -- Req: about
+export const POST_PAYMENT_STATUS = gql`
+  mutation PostPaymentStatus($about: String!) {
+    postPaymentStatus(about: $about) {
+      payment_status {
+        id
+        about
+      }
+    }
+  }
+`
+  //update (patch) -- Req: id -- NonReq: about
+export const PATCH_PAYMENT_STATUS = gql`
+  mutation PatchPaymentStatus($id: ID!, $about: String) {
+    patchPaymentStatus(id: $id, about: $about) {
+      payment_status {
+        id
+        about
+      }
+    }
+  }
+`
+  //delete -- Req: id
+export const DELETE_PAYMENT_STATUS = gql`
+  mutation DeletePaymentStatus($id: ID!) {
+    deletePaymentStatus(id: $id) {
+      payment_status {
+        id
+        about
+      }
+    }
+  }
+`
 
 //USER 
   //create (post)
