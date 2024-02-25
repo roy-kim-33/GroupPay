@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "proxy": "http://127.0.0.1:8000",
   "dependencies": {
     "@apollo/client": "^3.9.5",
     "graphql": "^16.8.1",
