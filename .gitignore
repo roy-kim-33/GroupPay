@@ -175,7 +175,7 @@ cython_debug/
 
 ### NextJS ###
 # dependencies
-/node_modules
+grouppay-frontend/node_modules
 /.pnp
 .pnp.js
 
