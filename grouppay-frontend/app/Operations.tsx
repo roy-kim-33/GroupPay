@@ -65,3 +65,102 @@ export const GET_GROUP_MEMBERS = gql`
     }
   }
 `
+
+//--------------------------MUTATIONS--------------------------------
+//USER 
+  //create (post) -- Req: Username, email, password
+export const POST_USER = gql`
+  mutation PostUser($username: String!, $email: String!, $password: String!) {
+    postUser(username: $username, email: $email, password: $password) {
+      user {
+        username
+        email
+        password
+      }
+    }
+  }
+`
+  //update (patch) -- Req: id -- NonReq: username, email, password
+export const PATCH_USER = gql`
+  mutation PatchUser($id: ID!, $username: String, $email: String, $password: String) {
+    patchUser(id: $id, username: $username, email: $email, password: $password) {
+      user {
+        id
+        username
+        email
+        password
+      }
+    }
+  }
+`
+  //delete
+export const DELETE_USER = gql`
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id) {
+      user {
+        id
+        username
+        email
+        password
+      }
+    }
+  }
+`
+
+//ACCOUNT 
+  //create (post) -- Req: user_id -- NonReq: balance
+export const POST_ACCOUNT = gql`
+  mutation PostAccount($user_id: ID!, $balance: Float) {
+    postAccount(user_id: $user_id, balance: $balance) {
+      account {
+        id
+        user_id
+        balance
+      }
+    }
+  }
+`
+  //update (patch) -- Req: id -- NonReq: user_id, balance
+export const PATCH_ACCOUNT = gql`
+  mutation PatchAccount($id: ID!, $user_id: ID, $balance: Float) {
+    patchAccount(id: $id, user_id: $user_id, balance: $balance) {
+      account {
+        id
+        user_id
+        balance
+      }
+    }
+  }
+`
+  //delete -- Req: id
+export const DELETE_ACCOUNT = gql`
+  mutation DeleteAccount($id: ID!) {
+    deleteAccount(id: $id) {
+      account {
+        id
+        user_id
+        balance
+      }
+    }
+  }
+`
+
+//PAYMENT STATUS 
+  //create (post)
+  //update (patch)
+  //delete
+
+//USER 
+  //create (post)
+  //update (patch)
+  //delete
+
+//GROUP 
+  //create (post)
+  //update (patch)
+  //delete
+
+//GROUP MEMBER 
+  //create (post)
+  //update (patch)
+  //delete
