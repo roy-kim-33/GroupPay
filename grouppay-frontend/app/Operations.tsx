@@ -180,17 +180,93 @@ export const DELETE_PAYMENT_STATUS = gql`
   }
 `
 
-//USER 
-  //create (post)
-  //update (patch)
-  //delete
-
 //GROUP 
-  //create (post)
-  //update (patch)
-  //delete
+  //create (post) -- Req: leader_user_id, payment, status_id -- NonReq: name, about
+export const POST_GROUP = gql`
+  mutation PostGroup($leader_user_id: ID!, $payment: Float!, $status_id: ID!, $name: String, $about: String) {
+    postGroup(leader_user_id: $leader_user_id, payment: $payment, status_id: $status_id, name; $name, about: $about) {
+      group {
+        id
+        name
+        leader_user_id
+        payment
+        status_id
+        about
+      }
+    }
+  }
+`
+  //update (patch) -- Req: id -- NonReq: leader_user_id, payment, status_id, name, about
+export const PATCH_GROUP = gql`
+  mutation PatchGroup($id: ID!, $leader_user_id: ID, $payment: Float, $status_id: ID, $name: String, $about: String) {
+    patchGroup(id: $id, leader_user_id: $leader_user_id, payment: $payment, status_id: $status_id, name; $name, about: $about) {
+      group {
+        id
+        name
+        leader_user_id
+        payment
+        status_id
+        about
+      }
+    }
+  }
+`
+  //delete -- Req: id
+export const DELETE_GROUP = gql`
+  mutation DeleteGroup($id: ID!) {
+    deleteGroup(id: $id) {
+      group {
+        id
+        name
+        leader_user_id
+        payment
+        status_id
+        about
+      }
+    }
+  }
+`
 
 //GROUP MEMBER 
-  //create (post)
-  //update (patch)
-  //delete
+  //create (post) -- Req: user_id, group_id -- NonReq: is_leader, accepted_payment
+export const POST_GROUP_MEMBER = gql`
+  mutation PostGroupMember($user_id: ID!, $group_id: ID!, $is_leader: Boolean, $accepted_payment: Boolean) {
+    postGroupMember(user_id: $user_id, group_id: $group_id, is_leader: $is_leader, accepted_payment: $accepted_payment) {
+      group_member {
+        id
+        user_id
+        group_id
+        is_leader
+        accepted_payment
+      }
+    }
+  }
+`
+  //update (patch) -- Req: id -- NonReq: user_id, group_id, is_leader, accepted_payment
+export const PATCH_GROUP_MEMBER = gql`
+  mutation PatchGroupMember($id: ID!, $user_id: ID, $group_id: ID, $is_leader: Boolean, $accepted_payment: Boolean) {
+    patchGroupMember(id: $id, user_id: $user_id, group_id: $group_id, is_leader: $is_leader, accepted_payment: $accepted_payment) {
+      group_member {
+        id
+        user_id
+        group_id
+        is_leader
+        accepted_payment
+      }
+    }
+  }
+`
+  //delete -- Req: id
+export const DELETE_GROUP_MEMBER = gql`
+  mutation DeleteGroupMember($id: ID!) {
+    deleteGroupMember(id: $id) {
+      group_member {
+        id
+        user_id
+        group_id
+        is_leader
+        accepted_payment
+      }
+    }
+  }
+`
