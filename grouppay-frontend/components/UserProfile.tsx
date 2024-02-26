@@ -8,16 +8,16 @@ export default function UserProfile() {
     const [deleting, setDeleting] = useState<boolean>(false);
 
     const { data: getData, loading: getLoading, error: getError, refetch } = useQuery(GET_USERS, {
-      //CURRENTLY HARDCODED TO BE ID #1 -- NEED TO FIX
+      //CURRENTLY HARDCODED TO BE ID #1 -- A TEMPORARY SOLUTION
       variables: { id: 1 },
     });
-    const [ deleteRecipeStep, {data: deleteData, loading: deleteLoading, error: deleteError} ] = useMutation(DELETE_USER);
+    const [ deleteUser, {data: deleteData, loading: deleteLoading, error: deleteError} ] = useMutation(DELETE_USER);
 
     //Handle delete account button click
     const handleDeleteAccount = () => {
         // use delete mutation to handle deletion
-        //CURRENTLY HARDCODED TO BE ID #1 -- NEED TO FIX
-        deleteRecipeStep({variables: {id: 1}})
+        //CURRENTLY HARDCODED TO BE ID #1 -- A TEMPORARY SOLUTION
+        deleteUser({variables: {id: 1}})
         // then, auto log out the user and display confirmation
     }
 
