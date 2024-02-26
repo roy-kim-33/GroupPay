@@ -2,7 +2,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { ApolloProvider } from '@apollo/client';
-import { apolloClient } from 'lib'
+import { apolloClient } from '@/utils'
 
 export default function addUser(): JSX.Element {
   return (
