@@ -11,6 +11,7 @@ export default function CreateUserForm(): JSX.Element {
             <form onSubmit={(e) => {
                 e.preventDefault();
                 setStatus("Submitted successfully!");
+                // insert API call to create user here!
             }}>
                 <UserInput id="username" label="Username" txtarea={false}></UserInput>
                 <UserInput id="email" label="Email" txtarea={false}></UserInput>
