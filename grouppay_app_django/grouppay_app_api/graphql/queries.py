@@ -4,17 +4,35 @@ queries
 import graphene
 from django.db.models import Q
 from django.contrib.auth import get_user_model
-from grouppay_app_api.models import User, Account, PaymentStatus, Group, GroupMember
-from .objtypes import UserType, AccountType, PaymentStatusType, GroupType, GroupMemberType
-from .utils import get_model_or_404
+from grouppay_app_api.models import (
+    User,
+    Account,
+    PaymentStatus,
+    Group,
+    GroupMember
+)
+from .objtypes import (
+    UserType,
+    AccountType,
+    PaymentStatusType,
+    GroupType,
+    GroupMemberType
+)
+from .utils import (
+    get_user_or_404,
+    get_account_or_404,
+    get_payment_status_or_404,
+    get_group_or_404,
+    get_group_member_or_404
+)
 
 class Query(graphene.ObjectType):
 
     # Define queries
     users_list = graphene.List(of_type=UserType, id=graphene.ID(), username=graphene.String(), email=graphene.String())
     accounts_list = graphene.List(of_type=AccountType, id=graphene.ID(), user_id=graphene.ID())
-    payment_statuses_list = graphene.List(of_type=PaymentStatusType, id=graphene.ID(), about=graphene.String())
-    groups_list = graphene.List(of_type=GroupType, id=graphene.ID(), name=graphene.String(), leader_user_id=graphene.ID(), created_at=graphene.DateTime(), payment=graphene.Float(), status_id=graphene.ID(), about=graphene.String())
+    payment_statuses_list = graphene.List(of_type=PaymentStatusType, id=graphene.ID(), status_code=graphene.Int() , about=graphene.String())
+    groups_list = graphene.List(of_type=GroupType, id=graphene.ID(), name=graphene.String(), leader_user=graphene.ID(), created_at=graphene.DateTime(), payment=graphene.Float(), status=graphene.ID(), about=graphene.String())
     group_members_list = graphene.List(of_type=GroupMemberType, id=graphene.ID(), user_id=graphene.ID(), group_id=graphene.ID(), is_leader=graphene.Boolean(), accepted_payment=graphene.Boolean(), accepted_payment_at=graphene.DateTime())
 
     # Detail View
@@ -32,7 +50,9 @@ class Query(graphene.ObjectType):
             filters &= Q(username__icontains=username)
         if email is not None:
             filters &= Q(email__icontains=email)
+        # return User.objects.filter(filters)
         return get_user_model().objects.filter(filters)
+
 
     def resolve_accounts_list(self, info, id=None, user_id=None):
         filters = Q()
@@ -42,28 +62,30 @@ class Query(graphene.ObjectType):
             filters &= Q(user_id=user_id)
         return Account.objects.filter(filters)
  
-    def resolve_payment_statuses_list(self, info, id=None, about=None):
+    def resolve_payment_statuses_list(self, info, id=None, status_code=None, description=None):
         filters = Q()
         if id is not None:
             filters &= Q(id=id)
-        if about is not None:
-            filters &= Q(about__icontains=about)
+        if status_code is not None:
+            filters &= Q(status_code=status_code)
+        if description is not None:
+            filters &= Q(description__icontains=description)
         return PaymentStatus.objects.filter(filters)  
 
-    def resolve_groups_list(self, info, id=None, name=None, leader_user_id=None, created_at=None, payment=None, status_id=None, about=None):
+    def resolve_groups_list(self, info, id=None, name=None, leader_user=None, created_at=None, payment=None, status=None, about=None):
         filters = Q()
         if id is not None:
             filters &= Q(id=id)
         if name is not None:
             filters &= Q(name__icontains=name)
-        if leader_user_id is not None:
-            filters &= Q(leader_user_id=leader_user_id)
+        if leader_user is not None:
+            filters &= Q(leader_user=leader_user)
         if created_at is not None:
             filters &= Q(created_at__gte=created_at)
         if payment is not None:
             filters &= Q(payment__exact=payment)
-        if status_id is not None:
-            filters &= Q(status_id__icontains=status_id)
+        if status is not None:
+            filters &= Q(status__icontains=status)
         if about is not None:
             filters &= Q(about__icontains=about)  
         return Group.objects.filter(filters)
@@ -84,17 +106,17 @@ class Query(graphene.ObjectType):
             filters &= Q(accepted_payment_at__gte=accepted_payment_at)
         return GroupMember.objects.filter(filters)
 
-    def resolve_user(self, id):
-        return get_model_or_404(User, id)
+    def resolve_user(self, info, id):
+        return get_user_or_404(id)
 
-    def resolve_account(self, id):
-        return get_model_or_404(Account, id)
+    def resolve_account(self, info, id):
+        return get_account_or_404(id)
 
-    def resolve_payment_status(self, id):
-        return get_model_or_404(PaymentStatus, id)
+    def resolve_payment_status(self, info, id):
+        return get_payment_status_or_404(id)
 
-    def resolve_group(self, id):
-        return get_model_or_404(Group, id)
+    def resolve_group(self, info, id):
+        return get_group_or_404(id)
 
-    def resolve_group_member(self, id):
-        return get_model_or_404(GroupMember, id)
+    def resolve_group_member(self, info, id):
+        return get_group_member_or_404(id)
