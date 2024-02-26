@@ -24,7 +24,7 @@ export default function UserProfile() {
     return (
       <div>
         <h1>Profile</h1>
-        {/* Query for user's name */}
+        {/* Query for user's username */}
         {/* Query for user's email (one query, two pieces of data) */}
         <button>Log out</button> {/* button should make some auth call */}
         <button onClick={() => {setDeleting(true);}}>Delete account</button> {/* button should display "Are you sure?" overlay, then call delete user based on response. */}
