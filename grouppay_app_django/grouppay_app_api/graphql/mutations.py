@@ -233,7 +233,7 @@ class PostGroupMember(graphene.Mutation):
             accepted_payment = False
         group_member = GroupMember(
             user=get_user_or_404(id=user_id),
-            group_id=get_group_or_404(id=group_id),
+            group=get_group_or_404(id=group_id),
             is_leader=is_leader,
             accepted_payment=accepted_payment,
             accepted_payment_at=datetime.now())

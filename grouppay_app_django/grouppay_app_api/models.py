@@ -62,7 +62,7 @@ class Group(models.Model):
     leader_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='led_groups')
     created_at = models.DateTimeField(auto_now_add=True)
     payment = models.FloatField()
-    status = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL)
+    status = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL, related_name='groups_with_status')
     about = models.CharField(max_length=500)
 
     def __str__(self):
@@ -70,7 +70,7 @@ class Group(models.Model):
 
 # GroupMember model
 class GroupMember(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='group_membership')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_members')
     is_leader = models.BooleanField(default=False)
     accepted_payment = models.BooleanField(default=False)
