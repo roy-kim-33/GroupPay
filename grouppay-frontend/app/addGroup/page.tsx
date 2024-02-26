@@ -81,10 +81,20 @@
 //         </div>
 //     );
 // }
+'use client'
 import React from 'react'
+import Link from 'next/link'
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from 'lib'
 
-export default function page() {
+export default function addGroup(): JSX.Element {
   return (
-    <div>page</div>
+    <main className="flex flex-col items-center px-4">
+      <ApolloProvider client={apolloClient}>
+        <Link href="/">
+          Home
+        </Link>
+      </ApolloProvider>
+    </main>
   )
 }

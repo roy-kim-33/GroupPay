@@ -1,5 +1,5 @@
 import React from 'react';
-import { links } from '@/library/data'; // Ensure this path is correct
+import { links } from '@/lib/data'; // Ensure this path is correct
 import Link from "next/link";
 
 export default function Header() {
