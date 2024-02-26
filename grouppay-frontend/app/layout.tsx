@@ -53,8 +53,9 @@ import Footer from "@/components/footer";
 
 import "./globals.css";
 
-// Apollo Client imports
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@/apollo/client';
+
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
 
 // Initialize Apollo Client
 const client = new ApolloClient({
@@ -77,11 +78,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="!scroll-smooth">
       <body className={`${inter.className} bg-blue-200 text-gray-950 relative pt-28 sm:pt-36`}>
-        <ApolloProvider client={client}>
+        {/* <ApolloProvider client={client}> */}
           <Header />
           {children}
           <Footer />
-        </ApolloProvider>
+        {/* </ApolloProvider> */}
       </body>
     </html>
   );

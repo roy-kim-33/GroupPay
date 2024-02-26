@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useMutation, gql } from '@apollo/client';
-import UserInput from '@/components/UserInput';
+// import React, { useState } from 'react';
+// import { useMutation, gql } from '@apollo/client';
+// import UserInput from '@/components/UserInput';
 
 // const CREATE_GROUP_MUTATION = gql`
 // mutation CreateGroup($leaderUserId: ID!, $name: String!, $about: String!, $payment: Float!, $statusCode: Int!) {
@@ -16,43 +16,75 @@ import UserInput from '@/components/UserInput';
 //       }
 //     }
 //   }
-//    `;
+// `;
 
-export default function CreateUserForm(): JSX.Element {
-    const [status, setStatus] = useState<string>("");
-    const [createGroup, { data, loading, error }] = useMutation(CREATE_GROUP_MUTATION);
+// // Define a TypeScript type for the response
+// type CreateGroupResponse = {
+//     postGroup: {
+//         group: {
+//             id: string;
+//             name: string;
+//             leaderUser: {
+//                 id: string;
+//                 username: string;
+//             };
+//             about: string;
+//         };
+//     };
+// };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const cost = parseFloat(formData.get('cost') as string);
-        const groupName = formData.get('groupname') as string;
-        const description = formData.get('description') as string;
+// export default function CreateUserForm(): JSX.Element {
+//     const [status, setStatus] = useState<string>("");
+//     const [createGroup, { data, loading, error }] = useMutation<CreateGroupResponse>(CREATE_GROUP_MUTATION);
 
-        createGroup({ variables: { cost, groupName, description } })
-          .then(response => {
-            // Handle the successful submission here
-            setStatus("Group created successfully!");
-          })
-          .catch(err => {
-            // Handle errors here
-            setStatus("Submission failed. Please try again.");
-            console.error("Error creating group:", err);
-          });
-    };
+//     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+//         e.preventDefault();
+//         const formData = new FormData(e.currentTarget);
+//         const leaderUserId = formData.get('leaderUserId') as string;
+//         const payment = parseFloat(formData.get('cost') as string);
+//         const name = formData.get('groupname') as string;
+//         const about = formData.get('description') as string;
+//         const statusCode = 1; // Adjust as necessary
+    
+//         createGroup({ 
+//             variables: { 
+//                 leaderUserId, 
+//                 name, 
+//                 about, 
+//                 payment, 
+//                 statusCode 
+//             } 
+//         })
+//         //   .then((response) => {
+//         //     // Now TypeScript knows the structure of `response`
+//         //     const groupName = response.data.postGroup.group.name;
+//         //     setStatus(`Group "${groupName}" created successfully!`);
+//         //   })
+//         //   .catch(err => {
+//         //     setStatus("Submission failed. Please try again.");
+//         //     console.error("Error creating group:", err);
+//         //   });
+//     };
+    
+//     return (
+//         <div>
+//             <h2>Create New Group</h2>
+//             <form onSubmit={handleSubmit}>
+//                 <UserInput id="cost" name="cost" label="Cost" txtarea={false}></UserInput>
+//                 <UserInput id="groupname" name="groupname" label="Group Name (Optional)" txtarea={false}></UserInput>
+//                 <UserInput id="description" name="description" label="Description (Optional)" txtarea={true}></UserInput>
+//                 <button type="submit">Submit</button>
+//                 {loading && <p>Submitting...</p>}
+//                 {error && <p>Error :( Please try againa)</p>}
+//                 <p>{status}</p>
+//             </form>
+//         </div>
+//     );
+// }
+import React from 'react'
 
-    return (
-        <div>
-            <h2>Create New Group</h2>
-            <form onSubmit={handleSubmit}>
-                <UserInput id="cost" name="cost" label="Cost" txtarea={false}></UserInput>
-                <UserInput id="groupname" name="groupname" label="Group Name (Optional)" txtarea={false}></UserInput>
-                <UserInput id="description" name="description" label="Description (Optional)" txtarea={true}></UserInput>
-                <button type="submit">Submit</button>
-                {loading && <p>Submitting...</p>}
-                {error && <p>Error :( Please try again</p>}
-                <p>{status}</p>
-            </form>
-        </div>
-    );
+export default function page() {
+  return (
+    <div>page</div>
+  )
 }
