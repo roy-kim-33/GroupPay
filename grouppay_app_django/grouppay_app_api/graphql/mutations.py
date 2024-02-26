@@ -207,7 +207,7 @@ class PostGroupMember(graphene.Mutation):
 
 class PatchGroupMember(graphene.Mutation):
     class Arguments:
-        id = graphene.ID()
+        id = graphene.ID(required=True)
         user_id = graphene.ID()
         group_id = graphene.ID()
         is_leader = graphene.Boolean()
