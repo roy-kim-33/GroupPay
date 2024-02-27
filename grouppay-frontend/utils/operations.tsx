@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client'
 
 //--------------------------QUERIES / RESOLVERS--------------------------------
 //users
@@ -184,7 +184,7 @@ export const DELETE_PAYMENT_STATUS = gql`
   //create (post) -- Req: leader_user_id, payment, status_id -- NonReq: name, about
 export const POST_GROUP = gql`
   mutation PostGroup($leader_user_id: ID!, $payment: Float!, $status_id: ID!, $name: String, $about: String) {
-    postGroup(leader_user_id: $leader_user_id, payment: $payment, status_id: $status_id, name; $name, about: $about) {
+    postGroup(leader_user_id: $leader_user_id, payment: $payment, status_id: $status_id, name: $name, about: $about) {
       group {
         id
         name
@@ -200,7 +200,7 @@ export const POST_GROUP = gql`
   //update (patch) -- Req: id -- NonReq: leader_user_id, payment, status_id, name, about
 export const PATCH_GROUP = gql`
   mutation PatchGroup($id: ID!, $leader_user_id: ID, $payment: Float, $status_id: ID, $name: String, $about: String) {
-    patchGroup(id: $id, leader_user_id: $leader_user_id, payment: $payment, status_id: $status_id, name; $name, about: $about) {
+    patchGroup(id: $id, leader_user_id: $leader_user_id, payment: $payment, status_id: $status_id, name: $name, about: $about) {
       group {
         id
         name

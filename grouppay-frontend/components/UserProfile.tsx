@@ -2,7 +2,7 @@
 //need to import user info to display here; 
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_USERS, DELETE_USER } from '../app/Operations';
+import { GET_USERS, DELETE_USER } from '../utils/operations';
 
 export default function UserProfile() {
     const [deleting, setDeleting] = useState<boolean>(false);
