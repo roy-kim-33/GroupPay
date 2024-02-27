@@ -47,7 +47,7 @@ class Query(graphene.ObjectType):
         if id is not None:
             filters &= Q(id=id)
         if username is not None:
-            filters &= Q(username__icontains=username)
+            filters &= Q(username__iexact=username)
         if email is not None:
             filters &= Q(email__icontains=email)
         # return User.objects.filter(filters)
