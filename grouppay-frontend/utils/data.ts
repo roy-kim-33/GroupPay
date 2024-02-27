@@ -1,7 +1,7 @@
 export const links = [
     {
       name: "Add Group",
-      hash: "/addgroup",
+      hash: "/addGroup",
     },
     {
       name: "Profile",
