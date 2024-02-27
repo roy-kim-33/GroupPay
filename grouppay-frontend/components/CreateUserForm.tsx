@@ -11,10 +11,11 @@ export default function CreateUserForm(): JSX.Element {
             <form onSubmit={(e) => {
                 e.preventDefault();
                 setStatus("Submitted successfully!");
+                // insert API call to create user here!
             }}>
-                <UserInput id="name" label="Full name" txtarea={false}></UserInput>
-                <UserInput id="phone" label="Phone number" txtarea={false}></UserInput>
+                <UserInput id="username" label="Username" txtarea={false}></UserInput>
                 <UserInput id="email" label="Email" txtarea={false}></UserInput>
+                <UserInput id="password" label="Password" txtarea={false}></UserInput>
             </form>
         </div>
     );
