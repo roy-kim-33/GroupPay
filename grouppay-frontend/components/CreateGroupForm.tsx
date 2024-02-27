@@ -1,6 +1,6 @@
 'use client'
 import React, {useState} from 'react';
-import UserInput from '../app/UserInput';
+import UserInput from './UserInput';
 
 export default function CreateUserForm(): JSX.Element {
     const [status, setStatus] = useState<string>("");

@@ -1,18 +1,26 @@
-from django.db import models
+from django.db import models, IntegrityError
+from django.db.models import Q
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+from django.contrib.auth import get_user_model
 # Custom user manager
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email: str, username: str, password: str):
         if not email:
             raise ValueError('Users must have an email address')
-        user = self.model(email=self.normalize_email(email))
+        email = self.normalize_email(email)
+        
+        existing_user = self.model.objects.filter(Q(username__iexact=username))
+        if existing_user.exists():
+            raise IntegrityError('Username already exists.')
+        
+        username = username.lower()
+        user = self.model(email=email, username=username)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password):
-        user = self.create_user(email, password=password)
+    def create_superuser(self, email: str, username: str, password: str):
+        user = self.create_user(email=email, username=username, password=password)
         user.is_admin = True
         user.save(using=self._db)
         return user
@@ -21,7 +29,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     # id = models.UUIDField
     username = models.CharField(max_length=255, unique=True)
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     
     objects = UserManager()
@@ -35,14 +43,15 @@ class User(AbstractBaseUser):
 # Account model
 class Account(models.Model):
     balance = models.FloatField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='account') # accounts with user_id=n aree deleeted if user with id=n is deleted
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='account') # accounts with user_id=n aree deleted if user with id=n is deleted
 
     def __str__(self):
         return f"Account {self.id} - Balance {self.balance}"
 
 # PaymentStatus model
 class PaymentStatus(models.Model):
-    about = models.CharField(max_length=500)
+    status_code = models.PositiveIntegerField(unique=True, null=True)
+    description = models.CharField(max_length=500)
 
     def __str__(self):
         return f"Status code {self.id} - {self.about}"
@@ -50,10 +59,10 @@ class PaymentStatus(models.Model):
 # Group model
 class Group(models.Model):
     name = models.CharField(max_length=255)
-    leader_user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='led_groups')
+    leader_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='led_groups')
     created_at = models.DateTimeField(auto_now_add=True)
     payment = models.FloatField()
-    status_id = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL)
+    status = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL, related_name='groups_with_status')
     about = models.CharField(max_length=500)
 
     def __str__(self):
@@ -61,8 +70,8 @@ class Group(models.Model):
 
 # GroupMember model
 class GroupMember(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='group_membership')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_members')
     is_leader = models.BooleanField(default=False)
     accepted_payment = models.BooleanField(default=False)
     accepted_payment_at = models.DateTimeField(null=True, blank=True)

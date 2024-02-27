@@ -4,9 +4,27 @@ mutations
 from datetime import datetime
 import graphene
 from django.contrib.auth import get_user_model
-from grouppay_app_api.models import User, Account, PaymentStatus, Group, GroupMember
-from .objtypes import UserType, AccountType, PaymentStatusType, GroupType, GroupMemberType
-from .utils import get_model_or_404
+from grouppay_app_api.models import (
+    # User,
+    Account,
+    PaymentStatus,
+    Group,
+    GroupMember
+)
+from .objtypes import (
+    UserType,
+    AccountType,
+    PaymentStatusType,
+    GroupType,
+    GroupMemberType
+)
+from .utils import (
+    get_user_or_404,
+    get_account_or_404,
+    get_payment_status_or_404,
+    get_group_or_404,
+    get_group_member_or_404
+)
 
 class PostUser(graphene.Mutation):
     class Arguments:
@@ -31,8 +49,8 @@ class PatchUser(graphene.Mutation):
         password = graphene.String()
 
     user = graphene.Field(type_=UserType)
-    def mutate(self, info, id, username, email, password):
-        user = get_model_or_404(User, id)
+    def mutate(self, info, id, username=None, email=None, password=None):
+        user = get_user_or_404(id=id) # fix this to use get_user_model
         if username is not None:
             user.username = username
         if email is not None:
@@ -48,20 +66,34 @@ class DeleteUser(graphene.Mutation):
 
     user = graphene.Field(type_=UserType)
     def mutate(self, info, id):
-        user = get_model_or_404(User, id)
+        user = get_user_or_404(id=id)
         user.delete()
         return DeleteUser(user=user)
 
+# class PostAccount(graphene.Mutation):
+#     class Arguments:
+#         balance = graphene.Float(default_value=100)
+#         user_id = graphene.ID(required=True)
+
+#     account = graphene.Field(type_=AccountType)
+#     def mutate(self, info, balance, user_id):
+#         if balance is None:
+#             balance = 100
+#         account = Account(balance=balance, user_id=user_id)
+#         account.save()
+#         return PostAccount(account=account)
+
 class PostAccount(graphene.Mutation):
     class Arguments:
-        balance = graphene.Float(default_value=100)
+        balance = graphene.Float()
         user_id = graphene.ID(required=True)
 
     account = graphene.Field(type_=AccountType)
     def mutate(self, info, balance, user_id):
         if balance is None:
             balance = 100
-        account = Account(balance=balance, user_id=user_id)
+        user = get_user_or_404(id=user_id)
+        account = Account(balance=balance, user=user)
         account.save()
         return PostAccount(account=account)
 
@@ -72,12 +104,13 @@ class PatchAccount(graphene.Mutation):
         user_id = graphene.ID()
 
     account = graphene.Field(type_=AccountType)
-    def mutate(self, info, id, balance, user_id):
-        account = get_model_or_404(Account, id)
+    def mutate(self, info, id, balance=None, user_id=None):
+        account = get_account_or_404(id=id)
         if balance is not None:
             account.balance = balance
         if user_id is not None:
-            account.user_id = user_id
+            user = get_user_or_404(id=user_id)
+            account.user = user
         account.save()
         return PatchAccount(account=account)
 
@@ -86,31 +119,33 @@ class DeleteAccount(graphene.Mutation):
         id = graphene.ID(required=True)
 
     account = graphene.Field(type_=AccountType)
-    def mutate(self, id):
-        account = get_model_or_404(Account, id)
+    def mutate(self, info, id):
+        account = get_account_or_404(id=id)
         account.delete()
         return DeleteAccount(account=account)
 
 class PostPaymentStatus(graphene.Mutation):
     class Arguments:
-        about = graphene.String(required=True)
+        status_code = graphene.Int(required=True)
+        description = graphene.String(required=True)
 
     payment_status = graphene.Field(type_=PaymentStatusType)
-    def mutate(self, info, about):
-        payment_status = PaymentStatus(about=about)
+    def mutate(self, info, status_code, description=None):
+        payment_status = PaymentStatus(status_code=status_code, description=description)
         payment_status.save()
         return PostPaymentStatus(payment_status=payment_status)
 
 class PatchPaymentStatus(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
-        about = graphene.String()
+        status_code = graphene.Int()
+        description = graphene.String()
 
     payment_status = graphene.Field(type_=PaymentStatusType)
-    def mutate(self, info, id, about):
-        payment_status = get_model_or_404(PaymentStatus, id)
-        if about is not None:
-            payment_status.about = about
+    def mutate(self, info, id, description=None):
+        payment_status = get_payment_status_or_404(status_code=id)
+        if description is not None:
+            payment_status.description = description
         payment_status.save()
         return PatchPaymentStatus(payment_status=payment_status)
 
@@ -120,30 +155,30 @@ class DeletePaymentStatus(graphene.Mutation):
 
     payment_status = graphene.Field(type_=PaymentStatusType)
     def mutate(self, info, id):
-        payment_status = get_model_or_404(PaymentStatus, id)
+        payment_status = get_payment_status_or_404(status_code=id)
         payment_status.delete()
         return DeletePaymentStatus(payment_status=payment_status)
 
 class PostGroup(graphene.Mutation):
     class Arguments:
-        name = graphene.String()
         leader_user_id = graphene.ID(required=True)
         payment = graphene.Float(required=True)
-        status_id = graphene.ID(required=True)
+        status_code = graphene.Int(required=True)
+        name = graphene.String()
         about = graphene.String()
 
     group = graphene.Field(type_=GroupType)
-    def mutate(self, info, name, leader_user_id, payment, status_id, about):
+    def mutate(self, info, leader_user_id, payment, status_code, name=None, about=None):
         if name is None:
             name = ''
         if about is None:
             about = ''
         group = Group(
             name=name,
-            leader_user_id=leader_user_id,
+            leader_user=get_user_or_404(id=leader_user_id),
             created_at=datetime.now(),
             payment=payment,
-            status_id=status_id,
+            status=get_payment_status_or_404(status_code=status_code),
             about=about)
         group.save()
         return PostGroup(group=group)
@@ -154,20 +189,20 @@ class PatchGroup(graphene.Mutation):
         name = graphene.String()
         leader_user_id = graphene.ID()
         payment = graphene.Float()
-        status_id = graphene.ID()
+        status_code = graphene.Int()
         about = graphene.String()
 
     group = graphene.Field(type_=GroupType)
-    def mutate(self, info, id, name, leader_user_id, payment, status_id, about):
-        group = get_model_or_404(Group, id)
+    def mutate(self, info, id, name=None, leader_user_id=None, payment=None, status_code=None, about=None):
+        group = get_group_or_404(id)
         if name is not None:
             group.name = name
         if leader_user_id is not None:
-            group.leader_user_id = leader_user_id
+            group.leader_user = get_user_or_404(id=leader_user_id)
         if payment is not None:
             group.payment = payment
-        if status_id is not None:
-            group.status_id = status_id
+        if status_code is not None:
+            group.status = get_payment_status_or_404(status_code=status_code)
         if about is not None:
             group.about = about
         group.save()
@@ -179,7 +214,7 @@ class DeleteGroup(graphene.Mutation):
 
     group = graphene.Field(type_=GroupType)
     def mutate(self, info, id):
-        group = get_model_or_404(Group, id)
+        group = get_group_or_404(id)
         group.delete()
         return DeleteGroup(group=group)
 
@@ -191,14 +226,14 @@ class PostGroupMember(graphene.Mutation):
         accepted_payment = graphene.Boolean()
 
     group_member = graphene.Field(type_=GroupMemberType)
-    def mutate(self, info, user_id, group_id, is_leader, accepted_payment):
+    def mutate(self, info, user_id, group_id, is_leader=None, accepted_payment=None):
         if is_leader is None:
             is_leader = False
         if accepted_payment is None:
             accepted_payment = False
         group_member = GroupMember(
-            user_id=user_id,
-            group_id=group_id,
+            user=get_user_or_404(id=user_id),
+            group=get_group_or_404(id=group_id),
             is_leader=is_leader,
             accepted_payment=accepted_payment,
             accepted_payment_at=datetime.now())
@@ -207,19 +242,19 @@ class PostGroupMember(graphene.Mutation):
 
 class PatchGroupMember(graphene.Mutation):
     class Arguments:
-        id = graphene.ID()
+        id = graphene.ID(required=True)
         user_id = graphene.ID()
         group_id = graphene.ID()
         is_leader = graphene.Boolean()
         accepted_payment = graphene.Boolean()
 
     group_member = graphene.Field(type_=GroupMemberType)
-    def mutate(self, info, id, user_id, group_id, is_leader, accepted_payment):
-        group_member = get_model_or_404(GroupMember, id)
+    def mutate(self, info, id, user_id=None, group_id=None, is_leader=None, accepted_payment=None):
+        group_member = get_group_member_or_404(id)
         if user_id is not None:
-            group_member.user_id = user_id
+            group_member.user = get_user_or_404(id=user_id)
         if group_id is not None:
-            group_member.group_id = group_id
+            group_member.group = get_group_or_404(id=group_id)
         if is_leader is not None:
             group_member.is_leader = is_leader
         if accepted_payment is not None:
@@ -233,7 +268,7 @@ class DeleteGroupMember(graphene.Mutation):
 
     group_member = graphene.Field(type_=GroupMemberType)
     def mutate(self, info, id):
-        group_member = get_model_or_404(GroupMember, id)
+        group_member = get_group_member_or_404(id)
         group_member.delete()
         return DeleteGroupMember(group_member=group_member)
 
