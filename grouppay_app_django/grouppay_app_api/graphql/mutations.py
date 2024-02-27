@@ -3,7 +3,9 @@ mutations
 '''
 from datetime import datetime
 import graphene
+import graphql_jwt
 from django.contrib.auth import get_user_model
+# from graphql_jwt.decorators import login_required, staff_member_required
 from grouppay_app_api.models import (
     # User,
     Account,
@@ -26,11 +28,61 @@ from .utils import (
     get_group_member_or_404
 )
 
-class PostUser(graphene.Mutation):
+class PostAdmin(graphene.Mutation):
     class Arguments:
         username = graphene.String(required=True)
         email = graphene.String(required=True)
         password = graphene.String(required=True) # consider using hash function here
+
+    user = graphene.Field(type_=UserType)
+    
+    # @staff_member_required
+    def mutate(self, info, username, email, password):
+        user = get_user_model().objects.create_superuser(
+            username=username,
+            email=email,
+            password=password
+        )
+        return PostAdmin(user=user)
+    
+class PatchAdmin(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        username = graphene.String()
+        email = graphene.String()
+        password = graphene.String()
+
+    user = graphene.Field(type_=UserType)
+    
+    # @staff_member_required
+    def mutate(self, info, id, username=None, email=None, password=None):
+        user = get_user_or_404(id=id) # fix this to use get_user_model
+        if username is not None:
+            user.username = username
+        if email is not None:
+            user.email = email
+        if password is not None:
+            user.password = password
+        user.save()
+        return PatchAdmin(user=user)
+
+class DeleteAdmin(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+
+    user = graphene.Field(type_=UserType)
+    
+    # @staff_member_required
+    def mutate(self, info, id):
+        user = get_user_or_404(id=id)
+        user.delete()
+        return DeleteAdmin(user=user)
+
+class PostUser(graphene.Mutation):
+    class Arguments:
+        username = graphene.String(required=True)
+        email = graphene.String(required=True)
+        password = graphene.String(required=True) # automatically hashed by django
 
     user = graphene.Field(type_=UserType)
     def mutate(self, info, username, email, password):
@@ -49,6 +101,8 @@ class PatchUser(graphene.Mutation):
         password = graphene.String()
 
     user = graphene.Field(type_=UserType)
+
+    # # @login_required
     def mutate(self, info, id, username=None, email=None, password=None):
         user = get_user_or_404(id=id) # fix this to use get_user_model
         if username is not None:
@@ -65,6 +119,8 @@ class DeleteUser(graphene.Mutation):
         id = graphene.ID(required=True)
 
     user = graphene.Field(type_=UserType)
+
+    # @login_required
     def mutate(self, info, id):
         user = get_user_or_404(id=id)
         user.delete()
@@ -91,6 +147,8 @@ class PatchAccount(graphene.Mutation):
         user_id = graphene.ID()
 
     account = graphene.Field(type_=AccountType)
+
+    # @login_required
     def mutate(self, info, id, balance=None, user_id=None):
         account = get_account_or_404(id=id)
         if balance is not None:
@@ -106,6 +164,8 @@ class DeleteAccount(graphene.Mutation):
         id = graphene.ID(required=True)
 
     account = graphene.Field(type_=AccountType)
+
+    # @login_required
     def mutate(self, info, id):
         account = get_account_or_404(id=id)
         account.delete()
@@ -117,6 +177,8 @@ class PostPaymentStatus(graphene.Mutation):
         description = graphene.String(required=True)
 
     payment_status = graphene.Field(type_=PaymentStatusType)
+
+    # @staff_member_required
     def mutate(self, info, status_code, description=None):
         payment_status = PaymentStatus(status_code=status_code, description=description)
         payment_status.save()
@@ -129,6 +191,8 @@ class PatchPaymentStatus(graphene.Mutation):
         description = graphene.String()
 
     payment_status = graphene.Field(type_=PaymentStatusType)
+
+    # @staff_member_required
     def mutate(self, info, id, description=None):
         payment_status = get_payment_status_or_404(status_code=id)
         if description is not None:
@@ -141,6 +205,8 @@ class DeletePaymentStatus(graphene.Mutation):
         id = graphene.ID(required=True)
 
     payment_status = graphene.Field(type_=PaymentStatusType)
+
+    # @staff_member_required
     def mutate(self, info, id):
         payment_status = get_payment_status_or_404(status_code=id)
         payment_status.delete()
@@ -155,6 +221,8 @@ class PostGroup(graphene.Mutation):
         about = graphene.String()
 
     group = graphene.Field(type_=GroupType)
+
+    # @login_required
     def mutate(self, info, leader_user_id, payment, status_code, name=None, about=None):
         if name is None:
             name = ''
@@ -180,6 +248,8 @@ class PatchGroup(graphene.Mutation):
         about = graphene.String()
 
     group = graphene.Field(type_=GroupType)
+
+    # @login_required
     def mutate(self, info, id, name=None, leader_user_id=None, payment=None, status_code=None, about=None):
         group = get_group_or_404(id)
         if name is not None:
@@ -200,6 +270,8 @@ class DeleteGroup(graphene.Mutation):
         id = graphene.ID(required=True)
 
     group = graphene.Field(type_=GroupType)
+
+    # @login_required
     def mutate(self, info, id):
         group = get_group_or_404(id)
         group.delete()
@@ -213,6 +285,8 @@ class PostGroupMember(graphene.Mutation):
         accepted_payment = graphene.Boolean()
 
     group_member = graphene.Field(type_=GroupMemberType)
+
+    # @login_required
     def mutate(self, info, user_id, group_id, is_leader=None, accepted_payment=None):
         if is_leader is None:
             is_leader = False
@@ -236,6 +310,8 @@ class PatchGroupMember(graphene.Mutation):
         accepted_payment = graphene.Boolean()
 
     group_member = graphene.Field(type_=GroupMemberType)
+
+    # @login_required
     def mutate(self, info, id, user_id=None, group_id=None, is_leader=None, accepted_payment=None):
         group_member = get_group_member_or_404(id)
         if user_id is not None:
@@ -254,6 +330,8 @@ class DeleteGroupMember(graphene.Mutation):
         id = graphene.ID(required=True)
 
     group_member = graphene.Field(type_=GroupMemberType)
+
+    # @login_required
     def mutate(self, info, id):
         group_member = get_group_member_or_404(id)
         group_member.delete()
@@ -261,6 +339,15 @@ class DeleteGroupMember(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+    delete_token_cookie = graphql_jwt.DeleteJSONWebTokenCookie.Field()
+    
+    post_admin = PostAdmin.Field()
+    patch_admin = PatchAdmin.Field()
+    delete_admin = DeleteAdmin.Field()
+
     post_user = PostUser.Field()
     patch_user = PatchUser.Field()
     delete_user = DeleteUser.Field()
