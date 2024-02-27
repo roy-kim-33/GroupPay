@@ -70,19 +70,6 @@ class DeleteUser(graphene.Mutation):
         user.delete()
         return DeleteUser(user=user)
 
-# class PostAccount(graphene.Mutation):
-#     class Arguments:
-#         balance = graphene.Float(default_value=100)
-#         user_id = graphene.ID(required=True)
-
-#     account = graphene.Field(type_=AccountType)
-#     def mutate(self, info, balance, user_id):
-#         if balance is None:
-#             balance = 100
-#         account = Account(balance=balance, user_id=user_id)
-#         account.save()
-#         return PostAccount(account=account)
-
 class PostAccount(graphene.Mutation):
     class Arguments:
         balance = graphene.Float()
