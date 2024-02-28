@@ -111,7 +111,7 @@ class PatchUser(graphene.Mutation):
         if email is not None:
             user.email = email
         if password is not None:
-            user.password = password
+            user.set_password(password)
         user.save()
         return PatchUser(user=user)
 
