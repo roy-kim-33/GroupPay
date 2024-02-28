@@ -9,3 +9,9 @@
 - **Next.js** app with mobile viewport
 - **Django** **GraphQL** for backend
 - **PostgreSQL** for DB
+
+# Auth
+1. django-graphql returns a Json Web Token (JWT) at log in with valid credentials (existing user) at `token_auth` mutation endpoint
+2. Login component fetches token and saves it as a cookie
+3. Other pages verify the cookie at `verify_token` mutation endpoint
+4. User will be logged out due to token expiration since tokens are not refreshed (`refresh_token` mutation endoint)

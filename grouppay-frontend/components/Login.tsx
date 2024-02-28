@@ -1,37 +1,41 @@
+'use client'
+
 import React, { useState, FormEvent, ChangeEvent, FormEventHandler } from 'react'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, gql } from '@apollo/client'
-import { GET_USERS } from '@/utils'
+import { GET_USERS, TOKEN_AUTH } from '@/utils'
+import Cookies from 'js-cookie'
 
 
-export default function PseudoAuth(): JSX.Element {
-    const router = useRouter();
+export default function Login(): JSX.Element {
+    const router = useRouter()
     const [usernameInput, setUsernameInput] = useState('')
     const [passwordInput, setPasswordInput] = useState('')
-    
-    const {
-        loading: loading_getUsers,
-        error: error_getUsers,
-        data: data_getUsers,
-        refetch: refetch_getUsers,
-    } = useQuery(
-        GET_USERS,
-        {
-            variables: { username: usernameInput },
-            notifyOnNetworkStatusChange: true,
-        }
-    )
+
+    const [tokenAuth, {
+        called: tokenAuthCalled,
+        loading: tokenAuthLoading,
+        reset: tokenAuthReset
+    }] = useMutation(TOKEN_AUTH)
+
+    const cookifyAuthToken = async () => {
+        const tokenAuthResponse = await tokenAuth({ variables: { username: usernameInput, password: passwordInput }})
+        const authToken = tokenAuthResponse.data.tokenAuth.token
+        const refreshExpiresIn = tokenAuthResponse.data.tokenAuth.refreshExpiresIn
+        Cookies.set('JWT', authToken, { expires: refreshExpiresIn, path: '/' })
+    }
 
     const handleLoginSubmit: FormEventHandler = async (e: FormEvent) => {
         e.preventDefault()
-        if (data_getUsers.data.usersList.length < 1) {
-            // post new user
-        } else {
-            // use this user as context
+        try {
+            await cookifyAuthToken()
+            router.push('/groups')
+        } catch (error) {
+            // console.error('Authentication error2:', error)
+            throw new Error(`Authentication error: ${error}`)
         }
-        await router.push('/groups');
-
     }
+
     const handleUsernameChange: FormEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setUsernameInput(e.target.value)
     }
