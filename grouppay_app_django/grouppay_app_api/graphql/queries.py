@@ -4,7 +4,7 @@ queries
 import graphene
 from django.db.models import Q
 from django.contrib.auth import get_user_model
-# from graphql_jwt.decorators import login_required, staff_member_required
+from graphql_jwt.decorators import login_required, staff_member_required
 from grouppay_app_api.models import (
     User,
     Account,
@@ -33,7 +33,7 @@ class Query(graphene.ObjectType):
     users_list = graphene.List(of_type=UserType, id=graphene.ID(), username=graphene.String(), email=graphene.String())
     accounts_list = graphene.List(of_type=AccountType, id=graphene.ID(), user_id=graphene.ID())
     payment_statuses_list = graphene.List(of_type=PaymentStatusType, id=graphene.ID(), status_code=graphene.Int() , about=graphene.String())
-    groups_list = graphene.List(of_type=GroupType, id=graphene.ID(), name=graphene.String(), leader_user_id=graphene.ID(), created_at=graphene.DateTime(), payment=graphene.Float(), status=graphene.ID(), about=graphene.String())
+    groups_list = graphene.List(of_type=GroupType, id=graphene.ID(), name=graphene.String(), leader_user_id=graphene.ID(), created_at=graphene.DateTime(), payment=graphene.Float(), status_id=graphene.ID(), about=graphene.String())
     group_members_list = graphene.List(of_type=GroupMemberType, id=graphene.ID(), user_id=graphene.ID(), group_id=graphene.ID(), is_leader=graphene.Boolean(), accepted_payment=graphene.Boolean(), accepted_payment_at=graphene.DateTime())
 
     # Detail View
@@ -76,7 +76,8 @@ class Query(graphene.ObjectType):
         return PaymentStatus.objects.filter(filters)  
 
     # @staff_member_required
-    def resolve_groups_list(self, info, id=None, name=None, leader_user_id=None, created_at=None, payment=None, status=None, about=None):
+    @login_required
+    def resolve_groups_list(self, info, id=None, name=None, leader_user_id=None, created_at=None, payment=None, status_id=None, about=None):
         filters = Q()
         if id is not None:
             filters &= Q(id=id)
@@ -88,8 +89,8 @@ class Query(graphene.ObjectType):
             filters &= Q(created_at__gte=created_at)
         if payment is not None:
             filters &= Q(payment__exact=payment)
-        if status is not None:
-            filters &= Q(status__icontains=status)
+        if status_id is not None:
+            filters &= Q(status=status_id)
         if about is not None:
             filters &= Q(about__icontains=about)  
         return Group.objects.filter(filters)

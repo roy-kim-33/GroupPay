@@ -5,6 +5,7 @@ from datetime import datetime
 import graphene
 import graphql_jwt
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 # from graphql_jwt.decorators import login_required, staff_member_required
 from grouppay_app_api.models import (
     # User,
@@ -367,3 +368,30 @@ class Mutation(graphene.ObjectType):
     post_group_member = PostGroupMember.Field()
     patch_group_member = PatchGroupMember.Field()
     delete_group_member = DeleteGroupMember.Field()
+
+    def resolve_delete_token_cookie(self, info, **kwargs):
+        # Your logic to delete the token cookie
+        # This might include setting an expired cookie or removing it from the client-side
+        response = JsonResponse({'success': 'Token cookie deleted'})
+        response.delete_cookie('your_token_cookie_name')
+        return response
+
+    def resolve_token_auth(self, info, **kwargs):
+        response = graphql_jwt.ObtainJSONWebToken.mutate(info, **kwargs)
+
+        # Set the token cookie in the response
+        token = response.data.get('token', None)
+        if token:
+            response.set_cookie('jwt_auth_token', token)
+
+        return response
+
+    def resolve_refresh_token(self, info, **kwargs):
+        response = graphql_jwt.Refresh.mutate(info, **kwargs)
+
+        # Set the refreshed token cookie in the response
+        token = response.data.get('token', None)
+        if token:
+            response.set_cookie('jwt_auth_token', token)
+
+        return response
