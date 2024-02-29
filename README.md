@@ -9,3 +9,11 @@
 - **Next.js** app with mobile viewport
 - **Django** **GraphQL** for backend
 - **PostgreSQL** for DB
+
+# Auth
+1. `Login` component fetches a Json Web Token (JWT) at log in through `token_auth` mutation endpoint and saves the JWT as a cookie
+2. `apolloClient` component sets JWT cookie as authorization header for grahql calls 
+3. `ApolloProviderWrapper` component uses `ApolloProvider` with `apolloClient` as client to include auth JWT in graphql calls
+4. Other pages can verify the JWT cookie at `verify_token` mutation endpoint to get username
+5. User will be logged out due to token expiration since tokens are not refreshed--can be done with `refresh_token` mutation endoint
+6. **Should secure endpoints to require login with `@login_required` decorator**

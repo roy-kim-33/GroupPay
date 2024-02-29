@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import Header from "@/components/header";
-import Head from "next/head";
+// import Header from "@/components/header";
+// import Head from "next/head";
 import Link from 'next/link'
 
 // import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
@@ -17,12 +17,18 @@ import Link from 'next/link'
 export default function Home() {
   return (
       <main className="flex flex-col items-center px-4">
-        <Link href="/addUser">
+        <Link href="/login">
+          Log In
+        </Link>
+        {/* <Link href="/addUser">
           Add User
         </Link>
         <Link href="/addGroup">
           Add Group
         </Link>
+        <Link href="/profile">
+          Profile
+        </Link> */}
       </main>
   )
 }
