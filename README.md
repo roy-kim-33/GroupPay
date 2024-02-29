@@ -11,9 +11,9 @@
 - **PostgreSQL** for DB
 
 # Auth
-1. django-graphql returns a Json Web Token (JWT) at log in with valid credentials (existing user) at `token_auth` mutation endpoint
-2. Login component fetches token and saves it as a cookie
-3. ApolloProviderWrapper adds saved cookie as authorization header for grahql calls include jwt cookie for auth
-4. Other pages verify the cookie at `verify_token` mutation endpoint
-5. User will be logged out due to token expiration since tokens are not refreshed (`refresh_token` mutation endoint)
-6. Only `resolve_groups_list` query endpoint requires login (`@login_required` decorator)
+1. `Login` component fetches a Json Web Token (JWT) at log in through `token_auth` mutation endpoint and saves the JWT as a cookie
+2. `apolloClient` component sets JWT cookie as authorization header for grahql calls 
+3. `ApolloProviderWrapper` component uses `ApolloProvider` with `apolloClient` as client to include auth JWT in graphql calls
+4. Other pages can verify the JWT cookie at `verify_token` mutation endpoint to get username
+5. User will be logged out due to token expiration since tokens are not refreshed--can be done with `refresh_token` mutation endoint
+6. **Should secure endpoints to require login with `@login_required` decorator**
